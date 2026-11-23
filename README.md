@@ -75,5 +75,4 @@ You can see from the test file what the methods in the standard libary look like
  * [Fibinacci](https://github.com/jwadedev/stacked/blob/main/test/assembler/AsmToVmTest.java#L152)
  * [Bubble Sort](https://github.com/jwadedev/stacked/blob/main/test/assembler/AsmToVmTest.java#L294)
  * [Multiply](https://github.com/jwadedev/stacked/blob/main/test/assembler/AsmToVmTest.java#L336)
- * 
 
