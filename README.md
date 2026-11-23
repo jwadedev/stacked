@@ -1,15 +1,15 @@
 # stacked
 This is a stack machine which executes programs in it's own machine code.  There is also an assembler, to create the machine code, and a small standard library.
 
-This project happened because I wanted to understand how the combinational logic I'd learned in school, could result in a computer that runs all the programs we write.  I understood programming language and combinational logic, but was missing the middle of how it worked.
+This project happened because I wanted to understand how the combinational logic I'd learned in school, could result in a computer that runs all the programs we write.  I understood programming language and combinational logic, but was missing the middle that tied it together.
 
 ## The VM
 
-I built the VM around an execution stack, because any expression can be calculated on a stack. This choice simplified the machine, but means all calculations need to be in postfix notation.  So a+b+c would be a,b,+,c,+ in the machine code.  
+I built the VM around an execution stack, because any expression can be calculated on a stack. This choice simplified the machine, but means all calculations need to be in postfix notation.  So `a+b+c` would be `a,b,+,c,+` in the machine code.  
 
-Every piece of data in the machine is just an integer. Occasionally those are treated as numbers, but mostly the machine sees them as instructions.  The whole computer's memory is an integer array. So the integer machine code is just part of that array.  
+The whole program is jsut a list of integers. Every entry is an instruction, the integers are only treated as data if the preceding instruction says to load it as data.  The whole computer's memory is an integer array.  
 
-Throughout the project I used Test Driven Development which was essential. Writing tests first for each feature ensured that the new piece worked, and didn't break any or the rest.  As the complexity grew the thorough test set protected against break other features..
+Throughout the project I used Test Driven Development which was essential. Writing tests first for each feature ensured that the new piece worked, and didn't break any or the rest.  As the complexity grew the thorough test set protected against breaking existing features..
 
 The first functional stack machine is  [VM1](https://github.com/jwadedev/stacked/blob/main/src/vm/Vm1.java).  
 To run it do the following...
@@ -25,17 +25,19 @@ Run just causes the system to loop through this cycle.. You can see it here [Run
 
 Here is what makes different VMs unique...
 1. [Vm1](https://github.com/jwadedev/stacked/blob/main/src/vm/Vm1.java) : Initial and simplest implementation.
-2. [ModVm1](https://github.com/jwadedev/stacked/blob/main/src/vm/ModVm1.java) : Functionally same but logic pulled out into separate files.
+2. [ModVm1](https://github.com/jwadedev/stacked/blob/main/src/vm/ModVm1.java) : Functionally same but logic is pulled out into separate files.
 3. [ModVm2](https://github.com/jwadedev/stacked/blob/main/src/vm/ModVm2.java) : Changed stacks to multi parameter, for speed. Not much improvement.
-4. [MicroVm1](https://github.com/jwadedev/stacked/blob/main/src/vm/MicroVm.java) : Broke cpu operations into Micro Ops, for more realistic HW copy.
-5. [MicroVm2](https://github.com/jwadedev/stacked/blob/main/src/vm/MicroVm2.java) : Micro Ops in classes ALU ops, Bus ops, Cmd ops. Decode() returns MicroOps for the operation, and execute then does those in series.
+4. [MicroVm1](https://github.com/jwadedev/stacked/blob/main/src/vm/MicroVm.java) : Broke cpu operations into Micro Ops, to make a more realistic copy of hardware.
+5. [MicroVm2](https://github.com/jwadedev/stacked/blob/main/src/vm/MicroVm2.java) : Divided Micro Ops in classes `ALU ops, Bus ops, Cmd ops`. The [decode()](https://github.com/jwadedev/stacked/blob/main/src/vm/MicroVm2.java#L123) method returns MicroOps for the given operation, and [execMops()](https://github.com/jwadedev/stacked/blob/main/src/vm/MicroVm2.java#L254) then does those in series.
 
 ## The Assembler
 
 Once the first VM was operational, I discovered the difficulty of writing programs as an array of integers in postfix notation.
 
-I wrote a simpler assembler for the machine language which my machine executed. Then I got very into improving it, and this is much better then the original.
-[The Assember](https://github.com/jwadedev/stacked/blob/main/src/assembler/Asm.java) is the final product.  This takes in a string of text, and creates an executable program.  The assembler support creating 'if,else,endif' blocks and 'while wend' blocks. It will handle the jump addressing.  It also supports defining jump targets.  A name with a ':' on the front acts as a location identifier for jump command.  A ';' acts as a return statement, popping of the return stack. A number in the code is to be pushed onto the execution stack, so in machine code it will be a Push followed by the number. Finally there are many stack specific operations, many inspired by the Forth language. Also, anything in (parenthesis) is treated as a comment and has no impact on the program.
+I wrote a simple assembler to generate the machine language which my machine executed. 
+Then I got very into improving it, and what's here is much better then the original.
+
+[The Assember](https://github.com/jwadedev/stacked/blob/main/src/assembler/Asm.java) is the final product.  This takes in a string of text, and creates an executable program.  The assembler support creating `if/else/endif` blocks and `while/wend` blocks. It will handle the jump addressing.  It also supports defining jump targets.  A name with a `:` on the front acts as a location identifier for jump command.  A `;` acts as a return statement, popping of the return stack. A number in the code is to be pushed onto the execution stack, so in machine code it will be a Push followed by the number. Finally there are many stack specific operations, many inspired by the Forth language. Also, anything in (parenthesis) is treated as a comment and has no impact on the program.
 
 Basic Stack machine ops.
   * Noop: No Op
